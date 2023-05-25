@@ -1,0 +1,3 @@
+- image: tfidf_vectorizer:0.1,
+  imagePullPolicy: IfNotPresent,
+  name: tfidfvectorizer
