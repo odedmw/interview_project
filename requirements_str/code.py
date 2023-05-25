@@ -1,24 +1,20 @@
-def get_requirements(file_path, found_modules = [], files_read = {} ):
-    files_read[file_path] = True
-
+def get_requirements(file_path, list_passed_files=[], str_modules=""):
     with open(file_path, "r") as file:
-        line = file.readline()
+        for module in file:
+            if "-r " != module[:3]:
+                
+                if len(str_modules) != 0:
+                    str_modules += "," + module.split("==")[0]
+                else:
+                    str_modules += module.split("==")[0]
+            else:
+                file_name = module.split(" ")[1].split(".")[0]
+                
+                if "requirements" in file_name and file_name not in list_passed_files:
+                    list_passed_files.append(file_name)
+                    new_path = file_path.split("\\")
+                    new_path[-1] = module.split(" ")[1].strip("\n")
+                    new_path = "/".join(new_path)
+                    str_modules = get_requirements(new_path, list_passed_files, str_modules)
 
-        while line:
-            if line[:3] == "-r ":
-                sub_file_name = line[3:].strip()
-
-                if sub_file_name not in files_read and "requirements" in sub_file_name:
-                    get_requirements(sub_file_name, found_modules, files_read)
-
-                line = file.readline()
-                continue
-
-            module_name = line.split("==")[0]
-
-            if module_name not in found_modules:
-                found_modules.append(module_name)
-
-            line = file.readline()
-
-    return ",".join(found_modules)
+    return str_modules
